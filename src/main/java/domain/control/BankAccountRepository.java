@@ -9,7 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * In memory Repository of Bank Accounts.
+ * In case of concurrent save of same BankAccount it throws ConcurrentModificationException so Service can retry it's operation on new state.
  */
 public class BankAccountRepository {
 

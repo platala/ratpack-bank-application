@@ -19,6 +19,9 @@ public class Money {
     public final int amount;
 
     public Money(Currency currency, int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("only positive money amount supported");
+        }
         this.currency = currency;
         this.amount = amount;
     }

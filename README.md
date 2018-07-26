@@ -14,8 +14,8 @@ Simple demo application of a bank based on Ratpack
 - PUT *admin/suspension?suspend={true|false}* - for testing purpose to simulate delays in Event handling
 
 # Tests
-- unit Test of BankAccountEntity as it contains main logic and aggregates other objects
-- Integration Test that uses REST API
+- *BankAccountTest* - unit Test of BankAccountEntity as it contains main logic and aggregates other objects
+- *BankIntegrationTest* - Integration Test that uses REST API
 
 # Possible improvements:
 - use Concordion for Integration Tests

@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- *
+ * Handles all operations on Bank Accounts - both coming from API and based on Domain Events.
  */
 public class SimpleBankService {
 
@@ -27,14 +27,14 @@ public class SimpleBankService {
 
     private final EventBus eventBus = new AsyncEventBus(Executors.newCachedThreadPool());
 
-    {
+    private volatile boolean isSuspended = false;
+    private final Queue<Object> pendingEvents = new ConcurrentLinkedQueue<>();
+
+    private final Queue<Object> failedEvents = new ConcurrentLinkedQueue<>();
+
+    public SimpleBankService() {
         eventBus.register(this);
     }
-
-    private volatile boolean isSuspended = false;
-
-    private final Queue<Object> pendingEvents = new ConcurrentLinkedQueue<>();
-    private final Queue<Object> failedEvents = new ConcurrentLinkedQueue<>();
 
     public BankAccountEntity bankAccount(BankAccountNumber bankAccountNumber) {
         return bankAccountRepository.getBankAccount(bankAccountNumber);
@@ -85,6 +85,7 @@ public class SimpleBankService {
             moneyTransferedEvent.moneyTransfer);
     }
 
+
     void operationOnBankAccountWithRetriesOnConcurrentModification(BankAccountNumber accountNumber,
                                                                    Consumer<BankAccountEntity> operationOnBankAccount,
                                                                    Object event) {
@@ -117,7 +118,7 @@ public class SimpleBankService {
 
     public void suspendEventSending(boolean isSuspended) {
         this.isSuspended = isSuspended;
-        while (!pendingEvents.isEmpty()) {
+        while (!isSuspended && !pendingEvents.isEmpty()) {
             eventBus.post(pendingEvents.remove());
         }
     }

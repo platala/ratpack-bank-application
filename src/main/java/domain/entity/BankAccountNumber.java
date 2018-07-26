@@ -9,6 +9,7 @@ public class BankAccountNumber {
 
     public static final String revolutAccountPrefix = "REV";
 
+
     private final String accountNumber;
 
     public BankAccountNumber(String accountNumber) {

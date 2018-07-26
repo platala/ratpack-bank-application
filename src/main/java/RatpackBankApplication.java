@@ -19,13 +19,13 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Handles creation of Ratpack Server and setup of all endpoints by defining Ratpack handlers.
  */
 public class RatpackBankApplication {
 
-    SimpleBankService simpleBankService = new SimpleBankService();
+    private final SimpleBankService simpleBankService = new SimpleBankService();
 
-    {
+    void createTwoBankAccounts() {
         simpleBankService.newBankAccount(Money.polish(1000));
         simpleBankService.newBankAccount(Money.polish(1000));
     }
@@ -42,7 +42,9 @@ public class RatpackBankApplication {
 
     void suspendEventSending(Context ctx) {
         Promise.value(Boolean.parseBoolean(ctx.getRequest().getQueryParams().getOrDefault("suspend", "false")))
-            .blockingOp(simpleBankService::suspendEventSending).map(x -> "SUSPEND: " + x).then(ctx::render);
+            .blockingOp(simpleBankService::suspendEventSending)
+            .map(x -> "SUSPEND: " + x)
+            .then(ctx::render);
     }
 
     void accountDetails(Context ctx) {
@@ -59,9 +61,9 @@ public class RatpackBankApplication {
         Promise.value(accountNumber(ctx))
             .blockingMap(simpleBankService::bankAccount)
             .map(BankAccountEntity::getPendingTransfers)
-            .map(pendingTransfers -> Jackson.json(JsonNodeFactory.instance.arrayNode().addAll(
-                pendingTransfers.stream().map(
-                    transfer -> JsonNodeFactory.instance.objectNode()
+            .map(pendingTransfers -> Jackson.json(JsonNodeFactory.instance.arrayNode()
+                .addAll(pendingTransfers.stream()
+                    .map(transfer -> JsonNodeFactory.instance.objectNode()
                         .put("transferId", transfer.transferId.toString())
                         .put("blockedMoney", transfer.money.toString()))
                     .collect(Collectors.toList()))))
@@ -90,6 +92,8 @@ public class RatpackBankApplication {
 
     public static void main(String[] args) throws Exception {
         RatpackBankApplication application = new RatpackBankApplication();
+        application.createTwoBankAccounts();
+
         RatpackServer.start(server -> server
             .handlers(application.chain())
         );

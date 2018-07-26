@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Aggregate Entity that holds infromation about Bank Account - mainly it's balance and pending money transfers that block part of money.
  */
 public class BankAccountEntity {
 
